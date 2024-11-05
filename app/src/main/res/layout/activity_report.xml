@@ -38,7 +38,8 @@
         android:layout_height="wrap_content"
         android:text="Add New"
         android:layout_marginTop="12dp"
-        android:layout_marginRight="3dp"/>
+        android:layout_marginRight="3dp"
+        android:layout_marginLeft="3dp"/>
 
     <Button
         android:id="@+id/btnBack"
@@ -47,6 +48,7 @@
         android:layout_height="wrap_content"
         android:text="Back"
         android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:backgroundTint="@color/black"
         android:layout_marginTop="12dp"/>
     </LinearLayout>
