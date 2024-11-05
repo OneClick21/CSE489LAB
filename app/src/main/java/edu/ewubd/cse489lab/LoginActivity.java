@@ -1,4 +1,4 @@
-package edu.ewubd.cse489_2021_2_60_071;
+package edu.ewubd.cse489lab;
 
 import android.os.Bundle;
 
