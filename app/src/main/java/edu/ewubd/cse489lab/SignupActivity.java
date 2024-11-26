@@ -42,7 +42,6 @@ public class SignupActivity extends AppCompatActivity {
             finishAffinity();
         }
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_signup);
 
         etUserName = findViewById(R.id.etUserName);
@@ -116,10 +115,5 @@ public class SignupActivity extends AppCompatActivity {
             }
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
     }
 }
