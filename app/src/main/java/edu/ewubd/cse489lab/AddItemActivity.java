@@ -1,17 +1,13 @@
 package edu.ewubd.cse489lab;
 
 import android.content.Intent;
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class AddItemActivity extends AppCompatActivity {
 
@@ -38,9 +34,36 @@ public class AddItemActivity extends AppCompatActivity {
                 String cost = etCost.getText().toString().trim();
                 String date = etDate.getText().toString().trim();
 
-                System.out.println(itemName);
-                System.out.println(cost);
-                System.out.println(date);
+                // Data validation
+
+                // Split Date
+                int VALUEOFYEAR = 2024;
+                int VALUEOFMONTH = 12;
+                int VALUEOFDATE = 10;
+
+                // Store valid data
+
+                Calendar currentCal = Calendar.getInstance();
+                long currentTime = currentCal.getTimeInMillis();
+                currentCal.setTimeInMillis(0);
+                currentCal.set(Calendar.YEAR, VALUEOFYEAR);
+                currentCal.set(Calendar.MONTH, VALUEOFMONTH);
+                currentCal.set(Calendar.DATE, VALUEOFDATE);
+
+                double CostValue = Double.parseDouble(cost);
+                long dateValue =  currentCal.getTimeInMillis();
+
+                String prevId = null;
+                Intent i = getIntent();
+                if(i.hasExtra("Item_ID")){
+                    prevId = i.getStringExtra("Item_ID");
+                }
+
+                ItemDB db = new ItemDB(AddItemActivity.this);
+                if(prevId == null){
+                    String id = itemName+":"+currentTime;
+                    db.insertItem(id, itemName, CostValue, dateValue);
+                }
 
             }
         });
