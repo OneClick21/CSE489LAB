@@ -34,78 +34,84 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sp = this.getSharedPreferences("my_sp", MODE_PRIVATE);
         String email = sp.getString("USER-EMAIL", "NOT-YET-CREATED");
-        if (!email.equals("NOT-YET-CREATED")){
-            System.out.println("Moving from signup.");
 
+
+        if (!getIntent().getBooleanExtra("FROM-LOGIN", false)) {
+            Toast.makeText(this, "You have been redirected form Signup page",
+                    Toast.LENGTH_SHORT).show();
             Intent i = new Intent(SignupActivity.this, LoginActivity.class);
             startActivity(i);
             finishAffinity();
         }
+        else {
+            System.out.println("Moving from signup.");
 
-        setContentView(R.layout.activity_signup);
 
-        etUserName = findViewById(R.id.etUserName);
-        etEmail = findViewById(R.id.etEmail);
-        etPhone = findViewById(R.id.etPhone);
-        etPassword = findViewById(R.id.etPassword);
-        etCPassword = findViewById(R.id.etCPassword);
+            setContentView(R.layout.activity_signup);
 
-        cbRememberUser = findViewById(R.id.cbRememberUser);
-        cbRememberLogin = findViewById(R.id.cbRememberLogin);
+            etUserName = findViewById(R.id.etUserName);
+            etEmail = findViewById(R.id.etEmail);
+            etPhone = findViewById(R.id.etPhone);
+            etPassword = findViewById(R.id.etPassword);
+            etCPassword = findViewById(R.id.etCPassword);
 
-        btnHaveAccount = findViewById(R.id.btnHaveAccount);
-        btnSignup = findViewById(R.id.btnSignup);
+            cbRememberUser = findViewById(R.id.cbRememberUser);
+            cbRememberLogin = findViewById(R.id.cbRememberLogin);
 
-        btnSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String userName = etUserName.getText().toString().trim();
-                String email = etEmail.getText().toString().trim();
-                String phone = etPhone.getText().toString().trim();
-                String pass = etPassword.getText().toString().trim();
-                String cPass = etCPassword.getText().toString().trim();
+            btnHaveAccount = findViewById(R.id.btnHaveAccount);
+            btnSignup = findViewById(R.id.btnSignup);
 
-                System.out.println(userName);
-                System.out.println(email);
-                System.out.println(phone);
-                System.out.println(pass);
-                System.out.println(cPass);
+            btnSignup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String userName = etUserName.getText().toString().trim();
+                    String email = etEmail.getText().toString().trim();
+                    String phone = etPhone.getText().toString().trim();
+                    String pass = etPassword.getText().toString().trim();
+                    String cPass = etCPassword.getText().toString().trim();
 
-                if (userName.length() < 4){
-                    Toast.makeText(SignupActivity.this, "Username should be 4-8 letters", Toast.LENGTH_LONG).show();
-                    return;
+                    System.out.println(userName);
+                    System.out.println(email);
+                    System.out.println(phone);
+                    System.out.println(pass);
+                    System.out.println(cPass);
+
+                    if (userName.length() < 4) {
+                        Toast.makeText(SignupActivity.this, "Username should be 4-8 letters", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        Toast.makeText(SignupActivity.this, "Use a valid Email", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (phone.length() < 8) {
+                        Toast.makeText(SignupActivity.this, "Phone should be 8-13 digits", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (pass.length() < 4) {
+                        Toast.makeText(SignupActivity.this, "Password should be 4 digits", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (!pass.equals(cPass)) {
+                        Toast.makeText(SignupActivity.this, "Password didn't match", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    SharedPreferences.Editor e = sp.edit();
+                    e.putString("USER-EMAIL", email);
+                    e.putString("USER-NAME", userName);
+                    e.putString("USER-PHONE", phone);
+                    e.putString("PASSWORD", pass);
+                    e.putBoolean("REMEMBER-USER", cbRememberLogin.isChecked());
+                    e.putBoolean("REMEMBER-LOGIN", cbRememberUser.isChecked());
+                    e.apply();
+
+                    Intent i = new Intent(SignupActivity.this, LoginActivity.class);
+                    startActivity(i);
+                    finishAffinity();
                 }
-                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-                    Toast.makeText(SignupActivity.this, "Use a valid Email", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (phone.length() < 8){
-                    Toast.makeText(SignupActivity.this, "Phone should be 8-13 digits", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (pass.length() < 4){
-                    Toast.makeText(SignupActivity.this, "Password should be 4 digits", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (!pass.equals(cPass)){
-                    Toast.makeText(SignupActivity.this, "Password didn't match", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                SharedPreferences.Editor e = sp.edit();
-                e.putString("USER-EMAIL", email);
-                e.putString("USER-NAME", userName);
-                e.putString("USER-PHONE", phone);
-                e.putString("PASSWORD", pass);
-                e.putBoolean("REMEMBER-USER", cbRememberLogin.isChecked());
-                e.putBoolean("REMEMBER-LOGIN", cbRememberUser.isChecked());
-                e.apply();
-
-                Intent i = new Intent(SignupActivity.this, LoginActivity.class);
-                startActivity(i);
-                finishAffinity();
-            }
-        });
+            });
+        }
 
         btnHaveAccount.setOnClickListener(new View.OnClickListener() {
             @Override
