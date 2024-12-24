@@ -20,6 +20,8 @@ public class AddItemActivity extends AppCompatActivity {
 
     private Button btnSave, btnBack;
 
+    private String id = "";
+
     private boolean isValidDate(String date) {
         if (!date.matches("\\d{2}-\\d{2}-\\d{4}")) {
             return false;
@@ -75,6 +77,17 @@ public class AddItemActivity extends AppCompatActivity {
                 String itemName = etItemName.getText().toString().trim();
                 String cost = etCost.getText().toString().trim();
                 String date = etDate.getText().toString().trim();
+
+                Intent i = getIntent();
+                if(i != null && i.hasExtra("ID")){
+                    id = i.getStringExtra("ID");
+                    String ItemName = i.getStringExtra("ITEM-NAME");
+                    long dateInMilliSeconds = i.getLongExtra("DATE", 0);
+                    double Cost = i.getDoubleExtra("COST", 0);
+                    String Date = dateInMilliSeconds+""; // write code to convert milliseconds to date
+                    etItemName.setText(itemName);
+                    etCost.setText(String.valueOf(cost));
+                    etDate.setText(date);
 
                 // Data validation
                 if (itemName.length() > 20) {
