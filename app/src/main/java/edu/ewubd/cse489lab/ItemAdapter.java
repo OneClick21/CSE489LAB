@@ -7,12 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class CustomItemAdapter extends ArrayAdapter<Item> {
+public class ItemAdapter extends ArrayAdapter<Item> {
     private LayoutInflater inflater;
     private ArrayList<Item> records;
-    public CustomItemAdapter(Context context, ArrayList<Item> records){
+    public ItemAdapter(Context context, ArrayList<Item> records){
         super(context, -1, records);
         this.records = records;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -32,7 +34,9 @@ public class CustomItemAdapter extends ArrayAdapter<Item> {
         return template;
     }
     private String getFormattedDate(long milliseconds){
-        String date = ""+milliseconds; // write code to convert milliseconds to date here
-        return date;
+        Date date = new Date(milliseconds); // code to convert milliseconds to date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String Date = sdf.format(date);
+        return Date;
     }
 }

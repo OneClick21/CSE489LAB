@@ -22,10 +22,10 @@
         android:text="Item Name"/>
     <TextView
         android:id="@+id/tvDate"
-        android:layout_width="60dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="Date"
-        android:gravity="center_horizontal"/>
+        android:gravity="center_vertical"/>
     <TextView
         android:id="@+id/tvCost"
         android:layout_width="80dp"

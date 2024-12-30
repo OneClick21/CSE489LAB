@@ -2,17 +2,16 @@ package edu.ewubd.cse489lab;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 
@@ -22,11 +21,13 @@ public class ReportActivity extends AppCompatActivity {
 
     private TextView tvTotalCost;
 
-    private Button btnAddNew, btnBack;
+    private Button btnAddNew, btnBack, btnSearch;
+
+    private EditText etSearch;
 
     private ArrayList<Item> items = new ArrayList<>();
 
-    private ItemAdapter itemAdapter;
+    private ItemAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +35,29 @@ public class ReportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_report);
 
         lvExpenditureList = findViewById(R.id.lvExpenditureList);
+        tvTotalCost = findViewById(R.id.tvTotalCost);
 
         btnBack = findViewById(R.id.btnBack);
         btnAddNew = findViewById(R.id.btnAddNew);
+        btnSearch = findViewById(R.id.btnSearch);
+
+        etSearch = findViewById(R.id.etSearch);
+
+        adapter = new ItemAdapter(this, items);
+        lvExpenditureList.setAdapter(adapter);
+
+        lvExpenditureList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Item selectedItem = items.get(position);
+                Intent intent = new Intent(ReportActivity.this, AddItemActivity.class);
+                intent.putExtra("ID", selectedItem.id);
+                intent.putExtra("ITEM-NAME", selectedItem.itemName);
+                intent.putExtra("DATE", selectedItem.date);
+                intent.putExtra("COST", selectedItem.cost);
+                startActivity(intent);
+            }
+        });
 
         btnAddNew.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,22 +75,68 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ReportActivity.this, ReportActivity.class);
+                i.putExtra("SEARCH", etSearch.getText().toString().trim());
+                startActivity(i);
+            }
+        });
+
     }
 
     public void onStart(){
         super.onStart();
+        Intent i = getIntent();
+        if (i.hasExtra("SEARCH")){
+            String searchBy = getIntent().getStringExtra("SEARCH");
+            etSearch.setText(searchBy);
+            loadData(searchBy);
+        } else {
+            loadData("");
+        }
+    }
+    private void loadData(String searchBy){
+        items.clear();
+        double totalCost = 0;
         ItemDB db = new ItemDB(this);
-        Cursor c = db.selectItems("SELECT * FROM items");
+        String q = "SELECT * FROM items";
+        if(!searchBy.isEmpty()){
+            if (searchBy.matches("\\d{2}-\\d{2}-\\d{4}")) {
+                q += " WHERE date="+getDateInMilliSecond(searchBy);
+            } else {
+                q += " WHERE itemName LIKE '%"+searchBy+"%'";
+            }
+        }
+        Cursor c = db.selectItems(q);
         while (c.moveToNext()){
             String id = c.getString(0);
             String itemName = c.getString(1);
-            String Cost = c.getString(2);
-            String Date = c.getString(3);
+            double cost = c.getDouble(2);
+            long date = c.getLong(3);
 
-            System.out.println("ID: "+ id);
-            System.out.println("itemName: "+ itemName);
-            System.out.println("Cost: "+ Cost);
-            System.out.println("Date: "+ Date);
+            System.out.println("ID: "+id);
+            System.out.println("itemName: "+itemName);
+            System.out.println("date: "+date);
+            System.out.println("cost: "+cost);
+            Item i = new Item(id, itemName, cost, date);
+            items.add(i);
+            totalCost += cost;
         }
+        adapter.notifyDataSetChanged();
+        tvTotalCost.setText(String.valueOf(totalCost));
+    }
+    private long getDateInMilliSecond(String date){
+        String[] dateParts = date.split("-");
+        int year = Integer.parseInt(dateParts[2]);
+        int month = Integer.parseInt(dateParts[1]) - 1; // Calendar.MONTH is zero-based
+        int day = Integer.parseInt(dateParts[0]);
+        Calendar currentCal = Calendar.getInstance();
+        currentCal.setTimeInMillis(0);
+        currentCal.set(Calendar.YEAR, year);
+        currentCal.set(Calendar.MONTH, month);
+        currentCal.set(Calendar.DATE, day);
+        return currentCal.getTimeInMillis();
     }
 }
