@@ -65,10 +65,10 @@
         android:text="Remember Login"/>
 
     <Button
-        android:id="@+id/btnDosentHaveAccount"
+        android:id="@+id/btnDoesntHaveAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dosen't Have Account"
+        android:text="Doesn't Have Account"
         android:backgroundTint="@color/black"
         android:layout_marginTop="12dp"/>
 

@@ -21,7 +21,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private CheckBox cbRememberUser, cbRememberLogin;
 
-    private Button btnDosentHaveAccount, btnLogin;
+    private Button btnDoesntHaveAccount, btnLogin;
 
     private SharedPreferences sp;
 
@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         cbRememberUser = findViewById(R.id.cbRememberUser);
         cbRememberLogin = findViewById(R.id.cbRememberLogin);
 
-        btnDosentHaveAccount = findViewById(R.id.btnDosentHaveAccount);
+        btnDoesntHaveAccount = findViewById(R.id.btnDoesntHaveAccount);
         btnLogin = findViewById(R.id.btnLogin);
 
         sp = this.getSharedPreferences("my_sp", MODE_PRIVATE);
@@ -92,10 +92,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        btnDosentHaveAccount.setOnClickListener(new View.OnClickListener() {
+        btnDoesntHaveAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(LoginActivity.this, SignupActivity.class);
+                i.putExtra("FROM-LOGIN", true);
                 startActivity(i);
             }
         });
