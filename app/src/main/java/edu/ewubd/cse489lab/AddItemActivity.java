@@ -3,6 +3,7 @@ package edu.ewubd.cse489lab;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.icu.util.Calendar;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,8 +12,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.NameValuePair;
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.message.BasicNameValuePair;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class AddItemActivity extends AppCompatActivity {
 
@@ -99,23 +105,24 @@ public class AddItemActivity extends AppCompatActivity {
                 double costValue = Double.parseDouble(cost);
                 long dateValue = currentCal.getTimeInMillis();
 
-                String prevId = null;
-                Intent i = getIntent();
-                if (i.hasExtra("Item_ID")) {
-                    prevId = i.getStringExtra("Item_ID");
-                }
 
                 ItemDB db = new ItemDB(AddItemActivity.this);
                 if (id.isEmpty()) {
-                    String id = itemName + ":" + currentTime;
+                    id = itemName + ":" + currentTime;
                     db.insertItem(id, itemName, costValue, dateValue);
                 } else {
                     db.updateItem(id, itemName, costValue, dateValue);
                 }
+
+                // Store in remote database
+                String keys[] = {"action", "sid", "semester", "id", "itemName", "cost", "date"};
+                String values[] = {"backup", "2021-2-60-071","2024-3", id, itemName, String.valueOf(costValue), String.valueOf(dateValue)};
+                httpRequest(keys, values);
+
                 db.close();
                 finish();
 
-                i = new Intent(AddItemActivity.this, ReportActivity.class);
+                Intent i = new Intent(AddItemActivity.this, ReportActivity.class);
                 startActivity(i);
             }
         });
@@ -127,5 +134,30 @@ public class AddItemActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+    }
+
+    private void httpRequest(final String keys[],final String values[]){
+        new AsyncTask<Void,Void,String>(){
+            @Override
+            protected String doInBackground(Void... voids) {
+                List<NameValuePair> params=new ArrayList<NameValuePair >();
+                for (int i=0; i<keys.length; i++){
+                    params.add(new BasicNameValuePair(keys[i],values[i]));
+                }
+                String url= "https://www.muthosoft.com/univ/cse489/index.php";
+                try {
+                    String data= RemoteAccess.getInstance().makeHttpRequest(url,"POST",params);
+                    return data;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+            protected void onPostExecute(String data){
+                if(data!=null){
+                    Toast.makeText(getApplicationContext(),data,Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
     }
 }

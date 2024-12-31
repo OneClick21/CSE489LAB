@@ -3,6 +3,7 @@ package edu.ewubd.cse489lab;
 import android.content.Intent;
 import android.database.Cursor;
 import android.icu.util.Calendar;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,7 +14,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.NameValuePair;
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.message.BasicNameValuePair;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReportActivity extends AppCompatActivity {
 
@@ -92,12 +100,13 @@ public class ReportActivity extends AppCompatActivity {
         if (i.hasExtra("SEARCH")){
             String searchBy = getIntent().getStringExtra("SEARCH");
             etSearch.setText(searchBy);
-            loadData(searchBy);
+            loadLocalData(searchBy);
         } else {
-            loadData("");
+            loadLocalData("");
+            loadRemoteData();
         }
     }
-    private void loadData(String searchBy){
+    private void loadLocalData(String searchBy){
         items.clear();
         double totalCost = 0;
         ItemDB db = new ItemDB(this);
@@ -116,16 +125,72 @@ public class ReportActivity extends AppCompatActivity {
             double cost = c.getDouble(2);
             long date = c.getLong(3);
 
-            System.out.println("ID: "+id);
-            System.out.println("itemName: "+itemName);
-            System.out.println("date: "+date);
-            System.out.println("cost: "+cost);
+            //System.out.println("ID: "+id);
+            //System.out.println("itemName: "+itemName);
+            //System.out.println("date: "+date);
+            //System.out.println("cost: "+cost);
             Item i = new Item(id, itemName, cost, date);
             items.add(i);
             totalCost += cost;
         }
         adapter.notifyDataSetChanged();
         tvTotalCost.setText(String.valueOf(totalCost));
+    }
+
+    private void loadRemoteData(){
+        String keys[] = {"action","sid","semester"};
+        String values[] ={"backup", "2021-2-60-071","2024-3"};
+        httpRequest(keys, values);
+    }
+
+    private void httpRequest(final String keys[],final String values[]){
+        new AsyncTask<Void,Void,String>(){
+            @Override
+            protected String doInBackground(Void... voids) {
+                List<NameValuePair> params=new ArrayList<NameValuePair >();
+                for (int i=0; i<keys.length; i++){
+                    params.add(new BasicNameValuePair(keys[i],values[i]));
+                }
+                String url= "https://www.muthosoft.com/univ/cse489/index.php";
+                try {
+                    String data= RemoteAccess.getInstance().makeHttpRequest(url,"POST",params);
+                    return data;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+            protected void onPostExecute(String data){
+                if(data!=null){
+                    updateLocalDBByServerData(data);
+                }
+            }
+        }.execute();
+    }
+
+    private void updateLocalDBByServerData (String data){
+        System.out.println("found");
+        try{
+            JSONObject jo = new JSONObject(data);
+            if(jo.has("items")){
+                items.clear();
+                double totalCost = 0;
+                JSONArray ja = jo.getJSONArray("items");
+                ItemDB db = new ItemDB(this);
+                for(int i=0; i<ja.length(); i++){
+                    JSONObject item = ja.getJSONObject(i);
+                    String id = item.getString("id");
+                    String itemName = item.getString("itemName");
+                    double cost = item.getDouble("cost");
+                    long date = item.getLong("date");
+                    Item item1 = new Item(id, itemName, cost, date);
+                    items.add(item1);
+                    totalCost += cost;
+
+                    // Write code here to insert lecture information in SQL Database
+                }
+            }
+        }catch(Exception e){}
     }
     private long getDateInMilliSecond(String date){
         String[] dateParts = date.split("-");
