@@ -45,12 +45,12 @@ public class ItemDB extends SQLiteOpenHelper {
 		cols.put("itemName", itemName);
 		cols.put("Cost", Cost);
 		cols.put("Date", Date);
-  		db.update("items", cols, "ID=?", new String[ ] {ID} );
+  		db.update("items", cols, "ID=?", new String[]{ID} );
 		db.close();
 	}
 	public void deleteItem(String ID) {
 		SQLiteDatabase db = this.getWritableDatabase();
-  		db.delete("items", "ID=?", new String[ ] {ID} );
+  		db.delete("items", "ID=?", new String[]{ID} );
 		db.close();
 	}
 	public Cursor selectItems(String query) {

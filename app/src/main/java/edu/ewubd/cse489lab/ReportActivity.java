@@ -96,15 +96,17 @@ public class ReportActivity extends AppCompatActivity {
 
     public void onStart(){
         super.onStart();
+        //loadRemoteData();
         Intent i = getIntent();
         if (i.hasExtra("SEARCH")){
             String searchBy = getIntent().getStringExtra("SEARCH");
             etSearch.setText(searchBy);
             loadLocalData(searchBy);
+            System.out.println("if");
         } else {
+            System.out.println("else");
             loadLocalData("");
         }
-        //loadRemoteData();
     }
     private void loadLocalData(String searchBy){
         items.clear();
@@ -190,6 +192,7 @@ public class ReportActivity extends AppCompatActivity {
                     // Write code here to insert lecture information in SQL Database
                     db.updateItem(id, itemName, cost, date);
                 }
+                db.close();
                 adapter.notifyDataSetChanged();
                 tvTotalCost.setText(String.valueOf(totalCost));
             }

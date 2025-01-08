@@ -9,11 +9,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -82,8 +78,8 @@ public class LoginActivity extends AppCompatActivity {
                 System.out.println(pass);
 
                 SharedPreferences.Editor ed = sp.edit();
-                ed.putBoolean("REMEMBER-USER", cbRememberLogin.isChecked());
-                ed.putBoolean("REMEMBER-LOGIN", cbRememberUser.isChecked());
+                ed.putBoolean("REMEMBER-USER", cbRememberUser.isChecked());
+                ed.putBoolean("REMEMBER-LOGIN", cbRememberLogin.isChecked());
                 ed.apply();
 
                 Intent i = new Intent(LoginActivity.this, ReportActivity.class);
