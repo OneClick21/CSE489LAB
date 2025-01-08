@@ -103,8 +103,8 @@ public class ReportActivity extends AppCompatActivity {
             loadLocalData(searchBy);
         } else {
             loadLocalData("");
-            loadRemoteData();
         }
+        //loadRemoteData();
     }
     private void loadLocalData(String searchBy){
         items.clear();
@@ -139,7 +139,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void loadRemoteData(){
         String keys[] = {"action","sid","semester"};
-        String values[] ={"backup", "2021-2-60-071","2024-3"};
+        String values[] ={"restore", "2021-2-60-071","2024-3"};
         httpRequest(keys, values);
     }
 
@@ -172,10 +172,10 @@ public class ReportActivity extends AppCompatActivity {
         System.out.println("found");
         try{
             JSONObject jo = new JSONObject(data);
-            if(jo.has("items")){
+            if(jo.has("classes")){
                 items.clear();
                 double totalCost = 0;
-                JSONArray ja = jo.getJSONArray("items");
+                JSONArray ja = jo.getJSONArray("classes");
                 ItemDB db = new ItemDB(this);
                 for(int i=0; i<ja.length(); i++){
                     JSONObject item = ja.getJSONObject(i);
@@ -188,7 +188,10 @@ public class ReportActivity extends AppCompatActivity {
                     totalCost += cost;
 
                     // Write code here to insert lecture information in SQL Database
+                    db.updateItem(id, itemName, cost, date);
                 }
+                adapter.notifyDataSetChanged();
+                tvTotalCost.setText(String.valueOf(totalCost));
             }
         }catch(Exception e){}
     }
