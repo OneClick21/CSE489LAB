@@ -96,7 +96,7 @@ public class ReportActivity extends AppCompatActivity {
 
     public void onStart(){
         super.onStart();
-        //loadRemoteData();
+        loadRemoteData();
         Intent i = getIntent();
         if (i.hasExtra("SEARCH")){
             String searchBy = getIntent().getStringExtra("SEARCH");
@@ -192,7 +192,7 @@ public class ReportActivity extends AppCompatActivity {
                     // Write code here to insert lecture information in SQL Database
                     db.updateItem(id, itemName, cost, date);
                 }
-                db.close();
+                //db.close();
                 adapter.notifyDataSetChanged();
                 tvTotalCost.setText(String.valueOf(totalCost));
             }

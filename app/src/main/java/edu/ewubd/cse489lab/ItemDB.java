@@ -45,6 +45,7 @@ public class ItemDB extends SQLiteOpenHelper {
 		cols.put("itemName", itemName);
 		cols.put("Cost", Cost);
 		cols.put("Date", Date);
+		db.insert("items", null, cols);
   		db.update("items", cols, "ID=?", new String[]{ID} );
 		db.close();
 	}
