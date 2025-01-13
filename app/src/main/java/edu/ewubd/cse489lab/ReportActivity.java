@@ -1,5 +1,7 @@
 package edu.ewubd.cse489lab;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.icu.util.Calendar;
@@ -64,6 +66,25 @@ public class ReportActivity extends AppCompatActivity {
                 intent.putExtra("DATE", selectedItem.date);
                 intent.putExtra("COST", selectedItem.cost);
                 startActivity(intent);
+            }
+        });
+
+        lvExpenditureList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Item selectedItem = items.get(position);
+                new AlertDialog.Builder(ReportActivity.this)
+                        .setTitle("Delete Item")
+                        .setMessage("Are you sure you want to delete this item?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteRemoteData(selectedItem.id);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                return true;
             }
         });
 
